@@ -30,21 +30,77 @@ void error(char *fmt, ...) {
     exit(1);
 }
 
+Token *new_token(TokenKind kind, Token *cur, char *str) {
+    Token *token = calloc(1, sizeof(Token));
+    token->kind = kind;
+    token->str = str;
+    cur->next = token;
+
+    return token;
+}
+
 Token* tokenize(char* p) {
     Token head;
     head.next = NULL;
-    Token* cur = &head;
+    Token *cur = &head;
 
     while (*p) {
-        if (isspa)
+        if (isspace(*p)) {
+            p++;
+            continue;
+        }
+
+        if (*p == '+' || *p == '-') {
+            cur = new_token(TK_RESERVED, cur, p++);
+        }
+        else if (isdigit(*p)) {
+            cur = new_token(TK_NUM, cur, p);
+            cur->val = strtol(p, &p, 10);
+        }
+        else {
+            error("トークナイズできません");
+        }
     }
+
+    new_token(TK_EOF, cur, p);
+    return head.next;
+}
+
+bool consume(char op) {
+    if (token->kind != TK_RESERVED || token->str[0] != op) {
+        return false;
+    }
+
+    token = token->next;
+    return true;
+}
+
+void expect(char op) {
+    if (token->kind != TK_RESERVED || token->str[0] != op) {
+        error("'%c'ではありません", op);
+    }
+
+    token = token->next;
+}
+
+int expect_number() {
+    if (token->kind != TK_NUM) {
+        error("数ではありません");
+    }
+
+    int val = token->val;
+    token = token->next;
+    return val;
+}
+
+bool at_eof() {
+    return token->kind == TK_EOF;
 }
 
 int main(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of argument passed.\n");
         return 1;
-
     }
 
     token = tokenize(argv[1]);
@@ -52,21 +108,16 @@ int main(int argc, char** argv) {
     printf(".intel_syntax noprefix\n");
     printf(".globl main\n");
     printf("main:\n");
-    printf("    mov rax, %ld\n", strtol(p, &p, 10));
 
-    while (*p) {
-        if (*p == '+') {
-            p++;
-            printf("    add rax, %ld\n", strtol(p, &p, 10));
+    printf("    mov rax, %d\n", expect_number());
+    while (!at_eof()){
+        if (consume('+')) {
+            printf("    add rax, %d\n", expect_number());
+            continue;
         }
-        else if (*p == '-') {
-            p++;
-            printf("    sub rax, %ld\n", strtol(p, &p, 10));
-        }
-        else {
-            fprintf(stderr, "予期しない文字です: '%c'", *p);
-            return 1;
-        }
+
+        expect('-');
+        printf("    sub rax, %d\n", expect_number());
     }
 
     printf("    ret\n");
