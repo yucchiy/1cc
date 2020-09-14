@@ -30,6 +30,23 @@ void error(char *fmt, ...) {
     exit(1);
 }
 
+char *user_input;
+
+void error_at(char *loc, char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    int pos = loc - user_input;
+
+    fprintf(stderr, "%s\n", user_input);
+    fprintf(stderr, "%*s", pos, "");
+    fprintf(stderr, "^ ");
+
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
 Token *new_token(TokenKind kind, Token *cur, char *str) {
     Token *token = calloc(1, sizeof(Token));
     token->kind = kind;
@@ -39,7 +56,8 @@ Token *new_token(TokenKind kind, Token *cur, char *str) {
     return token;
 }
 
-Token* tokenize(char* p) {
+Token* tokenize() {
+    char *p = user_input;
     Token head;
     head.next = NULL;
     Token *cur = &head;
@@ -58,7 +76,7 @@ Token* tokenize(char* p) {
             cur->val = strtol(p, &p, 10);
         }
         else {
-            error("トークナイズできません");
+            error_at(p, "トークナイズできません");
         }
     }
 
@@ -77,7 +95,7 @@ bool consume(char op) {
 
 void expect(char op) {
     if (token->kind != TK_RESERVED || token->str[0] != op) {
-        error("'%c'ではありません", op);
+        error_at(token->str, "'%c'ではありません", op);
     }
 
     token = token->next;
@@ -85,7 +103,7 @@ void expect(char op) {
 
 int expect_number() {
     if (token->kind != TK_NUM) {
-        error("数ではありません");
+        error_at(token->str, "数ではありません");
     }
 
     int val = token->val;
@@ -103,7 +121,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    token = tokenize(argv[1]);
+    user_input = argv[1];
+    token = tokenize();
 
     printf(".intel_syntax noprefix\n");
     printf(".globl main\n");
