@@ -1,0 +1,4 @@
+1cc
+*.o
+a.out
+tmp*
