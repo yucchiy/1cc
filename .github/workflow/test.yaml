@@ -1,0 +1,11 @@
+name: Test
+
+on: [push]
+
+jobs:
+    test_job:
+        container:
+            image: 'Dockerfile'
+        steps:
+        - name: Test
+            run: make test
