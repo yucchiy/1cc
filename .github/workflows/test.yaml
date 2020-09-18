@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
     test_job:
-        container:
-            image: 'Dockerfile'
+        runs-on: ubuntu-latest
         steps:
         - run: make test
