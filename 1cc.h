@@ -63,6 +63,6 @@ extern Node *code[100];
 
 void program();
 
-void gen(Node *node);
+void codegen();
 
 #endif

@@ -50,3 +50,16 @@ void gen(Node *node) {
 
     printf("    push rax\n");
 }
+
+void codegen() {
+    printf(".intel_syntax noprefix\n");
+    printf(".globl main\n");
+    printf("main:\n");
+
+    for (int i = 0; code[i] != NULL; i++) {
+        gen(code[i]);
+        printf("    pop rax\n");
+    }
+
+    printf("    ret\n");
+} 
