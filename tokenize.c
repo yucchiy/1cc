@@ -87,7 +87,7 @@ Token* tokenize() {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
         }
-        if (strchr("+-*/()<>", *p)) {
+        else if (strchr("+-*/()<>;", *p)) {
             cur = new_token(TK_RESERVED, cur, p++, 1);
         }
         else if (isdigit(*p)) {

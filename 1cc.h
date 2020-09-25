@@ -9,9 +9,9 @@
 #include <string.h>
 
 typedef enum {
-    TK_RESERVED,
-    TK_NUM,
-    TK_EOF,
+    TK_RESERVED, // 記号
+    TK_NUM,      // 整数トークン
+    TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
 typedef struct Token Token;
@@ -25,15 +25,15 @@ struct Token {
 };
 
 typedef enum {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_EQ,  // ==
-  ND_NE,  // !=
-  ND_LT,  // <
-  ND_LE,  // <=
-  ND_NUM, // Integer
+  ND_ADD,    // +
+  ND_SUB,    // -
+  ND_MUL,    // *
+  ND_DIV,    // /
+  ND_EQ,     // ==
+  ND_NE,     // !=
+  ND_LT,     // <
+  ND_LE,     // <=
+  ND_NUM,    // 整数
 } NodeKind;
 
 typedef struct Node Node;
@@ -59,8 +59,9 @@ Token* tokenize();
 
 extern char *user_input;
 extern Token *token;
+extern Node *code[100];
 
-Node *expr();
+void program();
 
 void gen(Node *node);
 

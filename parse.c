@@ -1,5 +1,7 @@
 #include "1cc.h"
 
+Node *code[100];
+
 Node *new_node(NodeKind kind, Node* lhs, Node* rhs) {
     Node *node = calloc(1, sizeof(Node));
 
@@ -19,12 +21,31 @@ Node *new_node_num(int val) {
     return node;
 }
 
+void program();
+Node *stmt();
+Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
+
+void program() {
+    int i = 0;
+    while (!at_eof()) {
+        code[i++] = stmt();
+    }
+
+    code[i] = NULL;
+}
+
+Node *stmt() {
+    Node *node = expr();
+    expect(";");
+    return node;
+}
 
 Node *expr() {
     return equality();
