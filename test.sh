@@ -51,4 +51,8 @@ assert 0 '1>=2;'
 
 assert 5 '1;2;3;4;5;'
 
+assert 4 'a = 2+2; a;'
+assert 6 'a = 2+2; b = a + 2; b;'
+assert 121 'a = (2*5+1); b = a*10; c = a+b; c;'
+
 echo OK

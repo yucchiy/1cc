@@ -39,6 +39,17 @@ bool consume(char* op) {
     return true;
 }
 
+Token *consume_ident() {
+    if (token->kind != TK_IDENT) {
+        return NULL;
+    }
+
+    Token *cur = token;
+    token = token->next;
+
+    return cur;
+}
+
 void expect(char* op) {
     if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len)) {
         error_at(token->str, "'%s'ではありません", op);
@@ -54,6 +65,7 @@ int expect_number() {
 
     int val = token->val;
     token = token->next;
+
     return val;
 }
 
@@ -87,7 +99,7 @@ Token* tokenize() {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
         }
-        else if (strchr("+-*/()<>;", *p)) {
+        else if (strchr("+-*/()<>;=", *p)) {
             cur = new_token(TK_RESERVED, cur, p++, 1);
         }
         else if (isdigit(*p)) {
@@ -95,6 +107,9 @@ Token* tokenize() {
             char *q = p;
             cur->val = strtol(p, &p, 10);
             cur->len = p - q;
+        }
+        else if ('a' <= *p || *p <= 'z') {
+            cur = new_token(TK_IDENT, cur, p++, 1);
         }
         else {
             error_at(p, "トークナイズできません");
